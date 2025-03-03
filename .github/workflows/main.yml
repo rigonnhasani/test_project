@@ -6,33 +6,26 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  build-and-push:
+  publish-package:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-     
+
       - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GH_PAT }}" | docker login ghcr.io -u rigonnhasani --password-stdin
+        run: echo "${{ secrets.GH_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Build and push the image
-        env:
-          IMAGE_NAME: ghcr.io/rigonnhasani/actions-runner-controller:latest
-        run: |
-          docker build -t $IMAGE_NAME .
-          docker push $IMAGE_NAME
+      - name: Set up image name
+        run: echo "IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/actions-runner-controller:latest" >> $GITHUB_ENV
 
-      - name: Send Email Notification
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.outlook.com
-          server_port: 587
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "CI/CD Pipeline Execution"
-          to: rigonnhasani@outlook.com
-          from: github-actions45@gmail.com
-          body: "Docker image has been built and pushed successfully."
+      - name: Build Docker image
+        run: docker build -t $IMAGE_NAME .
 
+      - name: Push Docker image to GitHub Packages
+        run: docker push $IMAGE_NAME
