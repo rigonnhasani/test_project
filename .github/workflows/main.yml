@@ -24,5 +24,15 @@ jobs:
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
 
-      
+      - name: Send Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.example.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "CI/CD Pipeline Execution"
+          to: rigonnhasani@outlook.com
+          from: github-actions45@gmail.com
+          body: "Docker image has been built and pushed successfully."
 
