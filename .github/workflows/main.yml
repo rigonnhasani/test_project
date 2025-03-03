@@ -14,8 +14,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
      
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GH_PAT }}" | docker login ghcr.io -u rigonnhasani --password-stdin
+
       - name: Build and push the image
-        run : |
-          docker login --username rigonnhasani --password ${{ secrets.GH_PAT }} ghcr.io
-          docker build . --tag ghcr.io/rigonnhasani/actions-runner-controller:latest
-          docker push ghcr.io/rigonnhasani/actions-runner-controller:latest
+        env:
+          IMAGE_NAME: ghcr.io/rigonnhasani/actions-runner-controller:latest
+        run: |
+          docker build -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+
+      
+
