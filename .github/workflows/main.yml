@@ -21,5 +21,5 @@ jobs:
         env:
           IMAGE_NAME: ghcr.io/rigonnhasani/actions-runner-controller:latest
         run: |
-          docker build -t $APP_JS .
-          docker push $APP_JS
+          docker build -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
