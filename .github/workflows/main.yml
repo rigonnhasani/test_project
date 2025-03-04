@@ -6,26 +6,20 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: read
-  packages: write
-
 jobs:
-  publish-package:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+     
       - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GH_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.GH_PAT }}" | docker login ghcr.io -u rigonnhasani --password-stdin
 
-      - name: Set up image name
-        run: echo "IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/actions-runner-controller:latest" >> $GITHUB_ENV
-
-      - name: Build Docker image
-        run: docker build -t $IMAGE_NAME .
-
-      - name: Push Docker image to GitHub Packages
-        run: docker push $IMAGE_NAME
+      - name: Build and push the image
+        env:
+          IMAGE_NAME: ghcr.io/rigonnhasani/actions-runner-controller:latest
+        run: |
+          docker build -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
